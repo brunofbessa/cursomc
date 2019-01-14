@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.brunofbessa.cursomc.domain.Categoria;
 import com.brunofbessa.cursomc.repositories.CategoriaRepository;
+import com.brunofbessa.cursomc.services.exceptions.ObjectNotFoundException;
 
 @Service
 public class CategoriaService {
@@ -18,6 +19,7 @@ public class CategoriaService {
 	// Mecanismo de injeção de dependência/inversão de controle para buscar o objeto da classe Categoria 
 	public Categoria buscar(Integer id) {
 		Optional<Categoria> obj = repo.findById(id);
-		return obj.orElse(null);
+		return obj.orElseThrow(() -> new ObjectNotFoundException(
+				"Objeto não encontrado! Id: " + id + " Tipo: " + Categoria.class.getName()));
 	}
 }

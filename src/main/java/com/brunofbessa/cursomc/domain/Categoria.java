@@ -12,6 +12,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 
 @Entity
 public class Categoria implements Serializable{
@@ -25,6 +27,8 @@ public class Categoria implements Serializable{
 	// Associacoes (N categoria x N produtos): Categoria possui lista de produtos
 	// A configuração do relacionamento NxN foi feita na classe Produto, sendo que nesta classe somente 
 	// referenciamos a instância categorias para fazer o lado inverso deste relacionamento
+	// Anotação JsonManagedReference serve para barrar referência cíclica (ao se buscar uma categoria por id)
+	@JsonManagedReference
 	@ManyToMany(mappedBy="categorias")
 	private List<Produto> produtos = new ArrayList<>();
 	
