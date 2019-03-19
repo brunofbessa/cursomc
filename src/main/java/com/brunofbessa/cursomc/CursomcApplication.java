@@ -1,5 +1,6 @@
 package com.brunofbessa.cursomc;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,13 +13,20 @@ import com.brunofbessa.cursomc.domain.Cidade;
 import com.brunofbessa.cursomc.domain.Cliente;
 import com.brunofbessa.cursomc.domain.Endereco;
 import com.brunofbessa.cursomc.domain.Estado;
+import com.brunofbessa.cursomc.domain.Pagamento;
+import com.brunofbessa.cursomc.domain.PagamentoComBoleto;
+import com.brunofbessa.cursomc.domain.PagamentoComCartao;
+import com.brunofbessa.cursomc.domain.Pedido;
 import com.brunofbessa.cursomc.domain.Produto;
+import com.brunofbessa.cursomc.domain.enums.EstadoPagamento;
 import com.brunofbessa.cursomc.domain.enums.TipoCliente;
 import com.brunofbessa.cursomc.repositories.CategoriaRepository;
 import com.brunofbessa.cursomc.repositories.CidadeRepository;
 import com.brunofbessa.cursomc.repositories.ClienteRepository;
 import com.brunofbessa.cursomc.repositories.EnderecoRepository;
 import com.brunofbessa.cursomc.repositories.EstadoRepository;
+import com.brunofbessa.cursomc.repositories.PagamentoRepository;
+import com.brunofbessa.cursomc.repositories.PedidoRepository;
 import com.brunofbessa.cursomc.repositories.ProdutoRepository;
 
 @SpringBootApplication
@@ -36,6 +44,11 @@ public class CursomcApplication implements CommandLineRunner{
 	private ClienteRepository clienteRepository;
 	@Autowired
 	private EnderecoRepository enderecoRepository;	
+	@Autowired
+	private PedidoRepository pedidoRepository;
+	@Autowired
+	private PagamentoRepository pagamentoRepository;
+	
 	
 	public static void main(String[] args) {
 		SpringApplication.run(CursomcApplication.class, args);
@@ -89,6 +102,26 @@ public class CursomcApplication implements CommandLineRunner{
 		clienteRepository.saveAll(Arrays.asList(cli1));
 		
 		enderecoRepository.saveAll(Arrays.asList(e1, e2));
+		
+		// Máscara de formtação de datas para o intante do pedido
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+		
+		// Para fins de praticidade, haverá dependência do Pagamento em Pedido (remover pagamento do construtor de Pedido)
+		Pedido ped1 = new Pedido(null, sdf.parse("30/09/2017 10:32"), cli1, e1);
+		Pedido ped2 = new Pedido(null, sdf.parse("10/10/2017 19:35"), cli1, e2);
+		
+		// Agora si instanciar os pagamentos
+		Pagamento pagto1 = new PagamentoComCartao(null, EstadoPagamento.QUITADO, ped1, 6);
+		ped1.setPagamento(pagto1);
+		
+		Pagamento pagto2 = new PagamentoComBoleto(null, EstadoPagamento.PENDENTE, ped2, sdf.parse("20/10/2016 00:00"), null);
+		ped2.setPagamento(pagto2);
+		
+		// Associar cliente a seus pedidos
+		cli1.getPedidos().addAll(Arrays.asList(ped1, ped2));
+		
+		pedidoRepository.saveAll(Arrays.asList(ped1, ped2));
+		pagamentoRepository.saveAll(Arrays.asList(pagto1, pagto2));
 		
 	}
 }
