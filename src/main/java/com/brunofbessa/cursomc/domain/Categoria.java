@@ -8,11 +8,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 
 @Entity
@@ -28,7 +24,10 @@ public class Categoria implements Serializable{
 	// A configuração do relacionamento NxN foi feita na classe Produto, sendo que nesta classe somente 
 	// referenciamos a instância categorias para fazer o lado inverso deste relacionamento
 	// Anotação JsonManagedReference serve para barrar referência cíclica (ao se buscar uma categoria por id)
-	@JsonManagedReference
+	// Em testes JsonManagedReference/JsonBackReference apresentaram falhas
+	// Trocar JsonManagedReference por vazio e JsonBackReference por JsonIgnore
+	
+	
 	@ManyToMany(mappedBy="categorias")
 	private List<Produto> produtos = new ArrayList<>();
 	
